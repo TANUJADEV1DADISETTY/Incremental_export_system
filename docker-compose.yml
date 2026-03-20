@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - DATABASE_URL=postgresql://user:password@db:5432/mydatabase
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./output:/app/output # Mount a volume for export files
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=mydatabase
+    volumes:
+      - ./seeds:/docker-entrypoint-initdb.d # Automated seeding script injected here
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d mydatabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
