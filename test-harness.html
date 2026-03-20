@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CDC Export System Demo</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    button { padding: 10px 20px; font-size: 16px; margin: 10px; cursor: pointer; }
+    #log { background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 5px; min-height: 200px; max-height: 400px; overflow-y: auto; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h1>CDC Export System API Demo</h1>
+  <button id="btnHealth" onclick="checkHealth()">1. Check Health</button>
+  <button id="btnFull" onclick="exportFull()">2. Full Export</button>
+  <button id="btnInc" onclick="exportInc()">3. Incremental Export</button>
+  <button id="btnDelta" onclick="exportDelta()">4. Delta Export</button>
+  <button id="btnWatermark" onclick="getWatermark()">5. Get Watermark</button>
+  
+  <div id="log"></div>
+
+  <script>
+    const baseUrl = 'http://localhost:8080';
+    const consumerId = 'demo-consumer-1';
+    
+    function logMessage(msg) {
+      const logDiv = document.getElementById('log');
+      logDiv.innerHTML += `<div>> ${msg}</div>`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    async function checkHealth() {
+      logMessage('Calling GET /health...');
+      const res = await fetch(`${baseUrl}/health`);
+      logMessage(`Response: ${await res.text()}`);
+    }
+
+    async function exportFull() {
+      logMessage(`Calling POST /exports/full with X-Consumer-ID: ${consumerId}...`);
+      const res = await fetch(`${baseUrl}/exports/full`, { method: 'POST', headers: { 'X-Consumer-ID': consumerId } });
+      logMessage(`Response (${res.status}): ${await res.text()}`);
+    }
+
+    async function exportInc() {
+      logMessage(`Calling POST /exports/incremental with X-Consumer-ID: ${consumerId}...`);
+      const res = await fetch(`${baseUrl}/exports/incremental`, { method: 'POST', headers: { 'X-Consumer-ID': consumerId } });
+      logMessage(`Response (${res.status}): ${await res.text()}`);
+    }
+
+    async function exportDelta() {
+      logMessage(`Calling POST /exports/delta with X-Consumer-ID: ${consumerId}...`);
+      const res = await fetch(`${baseUrl}/exports/delta`, { method: 'POST', headers: { 'X-Consumer-ID': consumerId } });
+      logMessage(`Response (${res.status}): ${await res.text()}`);
+    }
+
+    async function getWatermark() {
+      logMessage(`Calling GET /exports/watermark with X-Consumer-ID: ${consumerId}...`);
+      const res = await fetch(`${baseUrl}/exports/watermark`, { headers: { 'X-Consumer-ID': consumerId } });
+      logMessage(`Response (${res.status}): ${await res.text()}`);
+    }
+  </script>
+</body>
+</html>
